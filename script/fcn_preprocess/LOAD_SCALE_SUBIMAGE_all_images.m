@@ -1,9 +1,10 @@
-function [ imIRs, imVISs ] = LOAD_SCALE_SUBIMAGE_all_images( input_args )
+function [ imIRs, imVISs ] = LOAD_SCALE_SUBIMAGE_all_images( max_n )
 %LOAD_ALL_IMAGES - loads all images
 %   range_cond - dyz v bunce 0 = nacti range z configu
 %              - dyz 1 uzivatel zada novy range kery se ulozi
 %              - prvni sloupec IR obrazy, druhy VIS obrazy
 %   fld - slozka s obrazky
+% max_n - poèet obrázkù (nejvyšší index - poèítá se od 1)
 
 %% naètení obrazu a selekce podobrazu
 prefix_IR = 'IR_';
@@ -12,7 +13,7 @@ extension_IR = '.png';
 extension_VIS = '.png';
 
 fld = 'im/'; % folder
-max_n = 1; % poèet obrázkù (nejvyšší index - poèítá se od 1)
+
 
 range_cond = zeros(max_n,2); % znovunastaveni vsech
 range_cond = zeros(max_n,2); % nacitani vsech z ulozenych rozsahu

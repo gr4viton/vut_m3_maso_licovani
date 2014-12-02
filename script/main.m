@@ -61,7 +61,8 @@ global SI SY SX max_im_edits
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % :: Load
 % load images and scale & make subimage from them
-[imIRs, imVISs] = LOAD_SCALE_SUBIMAGE_all_images();
+max_im = 7; % change as the max image index is in [im] folder
+[imIRs, imVISs] = LOAD_SCALE_SUBIMAGE_all_images(max_im);
 % imIRs = cell-array se všemi obrázky ze složky <<<<<<<<<<<<<<<
 
 % a teï dál si vybereme 1 obrázek <<<<<<<<<<<<<<<<<<<<<<<<<<<<<
@@ -69,6 +70,12 @@ global SI SY SX max_im_edits
 %% the rest of first insert into xx_edits cell-array
 % on which from all the loaded images to do the edits
 index_im = 1;
+% dobrý obrázky jsou s indexama jsou (jakože zmenšený a potoèený trošièku)
+% 1 4 6
+% lehký jsou
+% 3 5 7
+% neostrý
+% 2
 
 % cell array of all titles to all image edits
 tits_IR = {}; 
@@ -112,16 +119,63 @@ ir_edits = cat(1, ir_edits, ir_edit); vis_edits = cat(1, vis_edits, vis_edit);
 tits_IR = cat(1, tits_IR, tit); tits_VIS = cat(1, tits_VIS, tit); 
 %%
 tit = 'median filter';
+% good is 100
+coef = 100;
 
-siz = [5,5];
+s = ceil(max(size(ir_edit))/coef);
+siz = [s,s];
 ir_edit = medfilt2( ir_edit, siz );
 
-siz = [10,10];
+s = ceil(max(size(vis_edit))/coef);
+siz = [s,s];
 vis_edit = medfilt2( vis_edit, siz);
 
 ir_edits = cat(1, ir_edits, ir_edit); vis_edits = cat(1, vis_edits, vis_edit); 
 tits_IR = cat(1, tits_IR, tit); tits_VIS = cat(1, tits_VIS, tit); 
 
+%%
+tit = 'gauss';
+
+type = tit;
+coef = 50;
+
+s = ceil(max(size(ir_edit))/coef);
+h = fspecial(type, [s,s]);
+ir_edit = imfilter( ir_edit, h );
+
+s = ceil(max(size(vis_edit))/coef);
+h = fspecial(type, [s,s]);
+vis_edit = imfilter( vis_edit, h );
+
+ir_edits = cat(1, ir_edits, ir_edit); vis_edits = cat(1, vis_edits, vis_edit); 
+tits_IR = cat(1, tits_IR, tit); tits_VIS = cat(1, tits_VIS, tit); 
+
+%%
+% tit = 'sobel';
+% 
+% type = tit;
+% 
+% % s = ceil(max(size(ir_edit))/100);
+% % siz = [s,s];
+% h = fspecial(type);
+% im_double = im2double(ir_edit);
+% horiz = imfilter( im_double, h );
+% verti = imfilter( im_double, h' );
+% ir_edit = sqrt(horiz.^2 + verti.^2);
+% 
+% % s = ceil(max(size(vis_edit))/100);
+% % siz = [s,s];
+% h = fspecial(type);
+% im_double = im2double(vis_edit);
+% horiz = imfilter( im_double, h );
+% verti = imfilter( im_double, h' );
+% vis_edit = sqrt(horiz.^2 + verti.^2);
+% 
+% 
+% ir_edits = cat(1, ir_edits, ir_edit); vis_edits = cat(1, vis_edits, vis_edit); 
+% tits_IR = cat(1, tits_IR, tit); tits_VIS = cat(1, tits_VIS, tit); 
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % :: PLOTTING
 max_IR = length(ir_edits);
