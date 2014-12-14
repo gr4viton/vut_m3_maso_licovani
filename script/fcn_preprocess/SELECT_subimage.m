@@ -39,8 +39,15 @@ if select_subimage_condition == 1
     %% get range
     [x,y] = ginput(2);
     close(f);
+    % outside image cutoff
+    for q = 1:2
+        x(q) = TRIM(x(q),1,size(im,2));
+        y(q) = TRIM(y(q),1,size(im,1));
+    end
+    
     %% store range
     range = round([x,y]);
+    range
     subimg_dim = range;
     save(f_config, 'range');
 end

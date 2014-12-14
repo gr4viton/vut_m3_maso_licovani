@@ -31,7 +31,6 @@ for n_im = 1:max_n
     %% SCALE 
     % the smaller image to the same scale 
 %     - (depends on camera to camera ratio)
-    
     %% selekce sektoru obrazu
     % pokud [select = 0] - použije naposledy oznaèená data (z uloženého souboru)
     % pokud chceme znovu naklikat range zadame 1 v range_cond na danem radku - viz vyse
@@ -40,11 +39,16 @@ for n_im = 1:max_n
     [sub_dims_IR] = SELECT_subimage(select_IR_subimage, imIR, f_imIR);
     [sub_dims_VIS] = SELECT_subimage(select_VIS_subimage, imVIS, f_imVIS);
 
+%     figure
+%     subplot(121);
+%     imshow(imIR);
     %% vytvoøení podobrazù 
     % na základì rozsahù uložených v sub_dims_XX
     [imIR] = CREATE_subimage(imIR, sub_dims_IR);
     [imVIS] = CREATE_subimage(imVIS, sub_dims_VIS);
 
+%     subplot(122);
+%     imshow(imIR);
     %% for later storing of more images
     imIRs{n_im} = imIR;
     imVISs{n_im} = imVIS;
