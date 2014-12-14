@@ -33,14 +33,6 @@
 % obrázkem
 %* a kde poslední dva øádky jsou pouze zøetìzený daných cell-arrayù
 
-%%
-% -> šetøí to fakt dost èasu, bo pak už staèí pøi nové "editaci" jenom 
-% pøekopírovat starý kód, pøidat tu funkci editace a popisek..
-% a ona se pak už automaticky vykreslí
-
-%%
-% -> ostatní funkce dejte (tøeba nakonec, až budou hotový) tøeba do složky 
-% fcn_licovani nebo jinak (ale pak ji pøidejte v èásti Inicializace do path
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -50,7 +42,7 @@
 % :: Inicializace
 
 close all; clear all; clc;
-addpath('fcn_preprocess', 'fcn_licovani');
+addpath('fcn_preprocess', 'fcn_imjoin_corr', 'fcn_imjoin_sigPoints');
 % ____________________________________________________
 global screen_size screen_full;
 % [left, bottom, width, height]:
@@ -70,7 +62,7 @@ max_im = 7; % change as the max image index is in [im] folder
 %% the rest of first insert into xx_edits cell-array
 % on which from all the loaded images to do the edits
 index_im = 1;
-% dobrý obrázky jsou s indexama jsou (jakože zmenšený a potoèený trošièku)
+% dobrý obrázky - zmenšený a potoèený trošièku
 % 1 4 6
 % lehký jsou
 % 3 5 7
@@ -208,27 +200,75 @@ SI=0; SY=1; SX=2;
 
 %% IR
     im = ir_final;
-    tit = 'IR final';
+    tit = 'IR preprocessed';
     SI=SI+1; subplot(SY,SX,SI);
     imshow(im,[]); title(tit);
 %% VIS
     im = vis_final;
-    tit = 'VIS final';
+    tit = 'VIS preprocessed';
     SI=SI+1; subplot(SY,SX,SI);
     imshow(im,[]); title(tit);
-    
+   
+% for printing the plots before calculation
+drawnow
+
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % :: JOIN the images
+prescale = 0.3;
+i1 = imresize(im2double(ir_final),prescale);
+v1 = imresize(im2double(vis_final),prescale);
+%% plot
+if prescale ~= 1;
+    txt = sprintf('IR & VIS prescaled by [%.2]- for quicker execution',prescale);
+    figure('Name',txt,'Position',screen_full); 
+    SI=0; SY=1; SX=2; 
 
-% todle už si doplòme jak potøebujeme -> buï do funkce JOIN_images (ve
-% složce fcn_licovani, nebo nìkam jinam :)
-answer_for_everything = JOIN_images(ir_final, vis_final);
+    %% IR
+        im = ir_final;
+        tit = 'IR prescaled';
+        SI=SI+1; subplot(SY,SX,SI);
+        imshow(im,[]); title(tit);
+    %% VIS
+        im = vis_final;
+        tit = 'VIS prescaled';
+        SI=SI+1; subplot(SY,SX,SI);
+        imshow(im,[]); title(tit);
+
+    drawnow
+end
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% :: korelacni metoda
+method_type = 'correlation method';
+% využitá výpoèetní jednotka
+% method = 'GPU';
+method = 'CPU';
+
+% interval a krok zkoušených mìøítek
+mins = 0.5;
+maxs = 2.5;
+% number of scales iterations
+nums = 5;
+scale = linspace(mins, maxs, nums);
+% scale = 0.5:0.1:2.5;
+% scale = 1.8:0.1:2.2;
+% scael = 1:0.05:1.5;
+
+% vlastní výpoèet
+[im_joined, x, y, scale] = imjoin_corr(v1, i1, scale, method);
 
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % :: PLOTTING
 
-% vykreslení podobrázkù (tìch vybraných rangem) pøes sebe podle parametrù z
-% JOIN_images() funcke
+txt = strcat('IR & VIS joined by [',method_type,']');
+figure('Name',txt,'Position',screen_full); 
+SI=0; SY=1; SX=2; 
 
+tit = strcat('Optimal parameters of joinment: scale[',...
+    num2str(scale),'], x=[',num2str(x),'], y=[',num2str(y),']');
+imshow(im_joined,[]);
+title(tit);
+
+
+%% do budoucna?
 % pøepoèet parametrù tak aby byli aplikovatelné na neoøíznuté obrázky
