@@ -96,7 +96,7 @@ join_method = 'correlation method';
 
 %% on which images (from all the loaded images) to do the edits
 % for index_im = 10:16 % BIG IMAGE LOOP START
-for index_im = 10:12 % BIG IMAGE LOOP START
+for index_im = 14:16 % BIG IMAGE LOOP START
     
 % cell array of all titles to all image edits
 tits_IR = {}; 
@@ -338,6 +338,7 @@ end
     fmt = 'png';
     fname = sprintf('%s%i_%s.%s',fout, index_im, fuse_method, fmt);
     imwrite(im_joined,fname,fmt);
+    disp(strcat('Image saved: "',fname,'"'));
 
 end
 
